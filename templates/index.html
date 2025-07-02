@@ -1,10 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block content %}
+<div class="flex h-screen">
+    <!-- Left Sidebar - Matches -->
+    <div class="w-1/2 bg-gray-800 p-4 overflow-y-auto">
+        <div class="mb-4">
+            <h2 class="text-xl font-bold mb-2">Football today</h2>
+            <div class="flex space-x-4 mb-4">
+                <button class="bg-blue-600 px-3 py-1 rounded text-sm">All</button>
+                <button class="bg-gray-700 px-3 py-1 rounded text-sm">Favourites</button>
+            </div>
+            <div class="flex space-x-4 mb-4">
+                <button class="bg-red-600 px-3 py-1 rounded text-sm">Live (28)</button>
+                <button class="bg-gray-700 px-3 py-1 rounded text-sm">Finished</button>
+                <button class="bg-gray-700 px-3 py-1 rounded text-sm">Upcoming</button>
+            </div>
+        </div>
+        
+        <!-- Match Cards -->
+        <div id="matches-container">
+            <!-- Matches will be loaded here -->
+        </div>
+    </div>
+    
+    <!-- Right Main Content -->
+    <div class="w-1/2 bg-gray-850 p-4">
+        <div class="mb-6">
+            <h3 class="text-lg font-bold mb-2">FIFA Club World Cup</h3>
+            <div class="bg-gray-700 p-4 rounded">
+                <div class="text-center">
+                    <p class="text-sm text-gray-400">Round of 16</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <span>Dortmund</span>
+                        <span class="text-xl font-bold">2 - 1</span>
+                        <span>Monterrey</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-1">FT</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rankings Section -->
+        <div class="mb-6">
+            <h3 class="text-lg font-bold mb-2">Rankings</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-700 p-3 rounded text-center">
+                    <p class="text-blue-400 font-bold">FIFA</p>
+                    <p class="text-sm">FIFA rankings</p>
+                </div>
+                <div class="bg-gray-700 p-3 rounded text-center">
+                    <p class="text-red-400 font-bold">UEFA</p>
+                    <p class="text-sm">UEFA rankings</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Players -->
+        <div>
+            <h3 class="text-lg font-bold mb-2">Top players</h3>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between bg-gray-700 p-2 rounded">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-gray-600 rounded-full mr-2"></div>
+                        <div>
+                            <p class="text-sm font-medium">Michele Di Gregorio</p>
+                            <p class="text-xs text-gray-400">Real Madrid vs. Juventus</p>
+                        </div>
+                    </div>
+                    <span class="bg-blue-600 px-2 py-1 rounded text-xs">8.3</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

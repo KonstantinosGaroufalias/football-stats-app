@@ -1,0 +1,21 @@
+.bg-gray-850 {
+    background-color: #1f2937;
+}
+
+.match-card {
+    transition: all 0.2s ease;
+}
+
+.match-card:hover {
+    background-color: #374151;
+}
+
+.live-indicator {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
