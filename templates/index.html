@@ -1,60 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="flex h-screen bg-gray-900">
-    <!-- Left Panel - Live Scores -->
-    <div class="w-1/2 bg-gray-800 p-6 overflow-y-auto">
-        <div class="mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold text-white">Live Scores</h2>
-                <div class="flex items-center">
-                    <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse mr-2"></div>
-                    <span class="text-sm text-gray-400">Live</span>
+<div class="app">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">Second Post Stats</h1>
+            <div class="header-actions">
+                <button id="refresh-btn" class="btn btn-primary">
+                    <span class="btn-text">Refresh Data</span>
+                </button>
+                <div id="status" class="status">
+                    <span class="status-text">Ready</span>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <!-- Filter Buttons -->
-            <div class="flex space-x-3 mb-6">
-                <button id="live-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Live
-                </button>
-                <button id="today-btn" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Today
-                </button>
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="layout">
+
+                <!-- Matches Section -->
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">Live Matches</h2>
+                        <div class="tabs">
+                            <button id="live-tab" class="tab active">Live</button>
+                            <button id="today-tab" class="tab">Today</button>
+                        </div>
+                    </div>
+
+                    <div id="matches" class="matches">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading matches...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Details Section -->
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">Match Details</h2>
+                    </div>
+
+                    <div id="details" class="details">
+                        <div class="empty-state">
+                            <div class="empty-icon">⚽</div>
+                            <h3>Select a match</h3>
+                            <p>Click on any match to view details</p>
+                        </div>
+                    </div>
+                </section>
+
             </div>
         </div>
-
-        <!-- Matches Container -->
-        <div id="matches-container" class="space-y-3">
-            <!-- Matches will be loaded here -->
-            <div class="text-center text-gray-400 py-8">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                Loading matches...
-            </div>
-        </div>
-    </div>
-
-    <!-- Right Panel - Team Lineup -->
-    <div class="w-1/2 bg-gray-850 p-6 overflow-y-auto">
-        <div id="lineup-section">
-            <h2 class="text-2xl font-bold text-white mb-6">Team Lineup</h2>
-
-            <!-- Default Message -->
-            <div id="no-lineup" class="text-center text-gray-400 py-12">
-                <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <p class="text-lg">Select a match to view lineup</p>
-                <p class="text-sm mt-2">Click on any match from the left panel</p>
-            </div>
-
-            <!-- Lineup Container -->
-            <div id="lineup-container" class="hidden">
-                <!-- Team lineups will be displayed here -->
-            </div>
-        </div>
-    </div>
+    </main>
 </div>
 {% endblock %}
