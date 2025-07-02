@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="112d4417-ee63-438b-9821-1fe2c9c71cc7" name="Changes" comment="Initial commit: Flask football stats app setup">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="112d4417-ee63-438b-9821-1fe2c9c71cc7" name="Changes" comment="Initial commit: Flask football stats app setup" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,6 +17,9 @@
         <option value="Python Script" />
       </list>
     </option>
+  </component>
+  <component name="Git.Rebase.Settings">
+    <option name="NEW_BASE" value="main" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -36,7 +37,7 @@
   "keyToString": {
     "DefaultHtmlFileTemplate": "HTML File",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main"
+    "git-widget-placeholder": "master"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -49,6 +50,7 @@
       <command value="pip install flask requests python-dotenv" />
       <command value="pip freeze &gt; requirements.txt" />
       <command value="git init git add . git commit -m &quot;Initial commit: Flask football stats app setup&quot;" />
+      <command value="git remote add origin https://github.com/KonstantinosGaroufalias/football-stats-app.git" />
     </option>
   </component>
   <component name="SharedIndexes">
