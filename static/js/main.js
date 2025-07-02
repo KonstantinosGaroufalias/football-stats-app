@@ -375,6 +375,76 @@ class FootballApp {
     updateStatus(message) {
         document.querySelector('.status-text').textContent = message;
     }
+
+async refreshData() {
+    const btn = document.getElementById('refresh-btn');
+    const originalText = btn.textContent;
+
+    btn.disabled = true;
+    btn.textContent = 'Fetching Live Data...';
+    btn.style.background = 'linear-gradient(135deg, #ff9a8b, #F87060)';
+
+    try {
+        const response = await fetch('/api/refresh-cache');
+        const data = await response.json();
+
+        if (data.success) {
+            // Show success message with data source
+            let message = data.message;
+            if (data.data_source === 'live_api') {
+                this.updateStatus(`🔴 LIVE: ${data.matches_count} matches`);
+                this.showNotification('✅ Live data refreshed successfully!', 'success');
+            } else if (data.data_source === 'static_fallback') {
+                this.updateStatus(`⚠️ FALLBACK: ${data.matches_count} matches`);
+                this.showNotification('⚠️ API unavailable, using test data', 'warning');
+            }
+
+            // Reload current view with new data
+            this.loadMatches(this.currentView);
+        } else {
+            this.updateStatus('❌ Refresh failed');
+            this.showNotification('❌ ' + data.error, 'error');
+        }
+    } catch (error) {
+        this.updateStatus('❌ Connection error');
+        this.showNotification('❌ Connection error: ' + error.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        btn.style.background = '';
+    }
+}
+
+// Add notification system
+showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+
+    Object.assign(notification.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        padding: '1rem 1.5rem',
+        borderRadius: '8px',
+        color: 'white',
+        fontWeight: '500',
+        zIndex: '9999',
+        maxWidth: '400px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+        background: type === 'success' ? '#10b981' :
+                   type === 'warning' ? '#f59e0b' :
+                   type === 'error' ? '#ef4444' : '#6b7280'
+    });
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 5000);
+}
 }
 
 // Initialize app
