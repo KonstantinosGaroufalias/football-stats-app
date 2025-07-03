@@ -17,15 +17,6 @@ Second Post Stats is a full-stack web application designed to showcase modern we
 - **Frontend Development** with modern CSS and JavaScript
 - **Real-time Data Processing** and visualization
 
-## 🎮 Demo Gifs
-
-![Football App Demo](./gifs/foot-stats-app-example.gif)
-
-
-
-![Football App Demo](./gifs/foot-stats-app-example2.gif)
-
-
 ## ✨ Features
 
 ### 🔴 Live Match Tracking
