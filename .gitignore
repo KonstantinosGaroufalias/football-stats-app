@@ -1,7 +1,27 @@
+# Environment variables
 .env
 *.env
+
+# Database files
+*.db
+football_stats.db
+api_usage.json
+
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
-football_cache.db
+*.pyd
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Logs
+*.log
