@@ -48,6 +48,14 @@ class FootballApp {
             btn.textContent = 'Refresh Data';
         }
     }
+    searchMatches(query) {
+    const filteredMatches = this.allMatches.filter(match =>
+        match.home_team.toLowerCase().includes(query.toLowerCase()) ||
+        match.away_team.toLowerCase().includes(query.toLowerCase()) ||
+        match.league.toLowerCase().includes(query.toLowerCase())
+    );
+    this.renderMatches(filteredMatches);
+    }
 
     async loadMatches(type) {
         const container = document.getElementById('matches');
@@ -192,7 +200,6 @@ class FootballApp {
         });
     }
 
-    // FORMATION-SPECIFIC POSITIONING SYSTEM
     positionPlayersInFormation(lineup) {
         const container = document.getElementById(`formation-${lineup.team_name.replace(/\s+/g, '')}`);
         if (!container) return;
@@ -202,7 +209,6 @@ class FootballApp {
 
         console.log(`Positioning ${lineup.team_name} in ${formation} formation`);
 
-        // Sort players by their grid/position for consistent ordering
         const sortedPlayers = players.sort((a, b) => {
             if (a.grid && b.grid) {
                 const [aRow, aCol] = a.grid.split(':').map(Number);
@@ -213,7 +219,6 @@ class FootballApp {
             return 0;
         });
 
-        // Use formation-specific positioning
         if (formation === '4-3-3') {
             this.position433Formation(container, sortedPlayers);
         } else if (formation === '4-2-3-1') {
@@ -227,12 +232,10 @@ class FootballApp {
         } else if (formation === '3-4-3') {
             this.position343Formation(container, sortedPlayers);
         } else {
-            // Default/fallback formation
             this.positionDefaultFormation(container, sortedPlayers);
         }
     }
 
-    // 4-3-3 Formation
     position433Formation(container, players) {
         const positions = [
             // GK
@@ -248,7 +251,6 @@ class FootballApp {
         this.positionPlayersAtCoordinates(container, players, positions);
     }
 
-    // 4-2-3-1 Formation
     position4231Formation(container, players) {
         const positions = [
             // GK
@@ -266,7 +268,6 @@ class FootballApp {
         this.positionPlayersAtCoordinates(container, players, positions);
     }
 
-    // 4-4-2 Formation
     position442Formation(container, players) {
         const positions = [
             // GK
@@ -282,7 +283,6 @@ class FootballApp {
         this.positionPlayersAtCoordinates(container, players, positions);
     }
 
-    // 3-5-2 Formation
     position352Formation(container, players) {
         const positions = [
             // GK
@@ -298,7 +298,6 @@ class FootballApp {
         this.positionPlayersAtCoordinates(container, players, positions);
     }
 
-    // 5-3-2 Formation
     position532Formation(container, players) {
         const positions = [
             // GK
@@ -314,7 +313,6 @@ class FootballApp {
         this.positionPlayersAtCoordinates(container, players, positions);
     }
 
-    // 3-4-3 Formation
     position343Formation(container, players) {
         const positions = [
             // GK
@@ -330,7 +328,6 @@ class FootballApp {
         this.positionPlayersAtCoordinates(container, players, positions);
     }
 
-    // Default formation for unknown formations
     positionDefaultFormation(container, players) {
         const positions = [
             // GK
@@ -346,7 +343,6 @@ class FootballApp {
         this.positionPlayersAtCoordinates(container, players, positions);
     }
 
-    // Helper function to position players at specific coordinates
     positionPlayersAtCoordinates(container, players, positions) {
         players.forEach((player, index) => {
             if (index < positions.length) {
@@ -399,7 +395,6 @@ async refreshData() {
                 this.showNotification('⚠️ API unavailable, using test data', 'warning');
             }
 
-            // Reload current view with new data
             this.loadMatches(this.currentView);
         } else {
             this.updateStatus('❌ Refresh failed');
@@ -415,7 +410,6 @@ async refreshData() {
     }
 }
 
-// Add notification system
 showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;

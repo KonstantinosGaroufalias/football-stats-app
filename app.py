@@ -4,6 +4,10 @@ from config import Config
 from models import db, Match, Team, CacheStatus
 from datetime import datetime, date, timedelta
 import json
+import os
+
+# Import static data from separate file
+from static_data import STATIC_MATCHES, STATIC_LINEUPS
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -19,132 +23,51 @@ with app.app_context():
     db.create_all()
 
 
+# API Usage Tracker Class
+class APIUsageTracker:
+    def __init__(self, max_calls_per_day=100):
+        self.max_calls_per_day = max_calls_per_day
+        self.usage_file = 'api_usage.json'
+
+    def can_make_call(self):
+        usage = self.get_today_usage()
+        return usage < self.max_calls_per_day
+
+    def record_api_call(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        usage_data = self.load_usage_data()
+
+        if today not in usage_data:
+            usage_data[today] = 0
+        usage_data[today] += 1
+
+        self.save_usage_data(usage_data)
+
+    def get_today_usage(self):
+        today = datetime.now().strftime('%Y-%m-%d')
+        usage_data = self.load_usage_data()
+        return usage_data.get(today, 0)
+
+    def load_usage_data(self):
+        if os.path.exists(self.usage_file):
+            with open(self.usage_file, 'r') as f:
+                return json.load(f)
+        return {}
+
+    def save_usage_data(self, data):
+        with open(self.usage_file, 'w') as f:
+            json.dump(data, f)
+
+
+# Create API tracker instance
+api_tracker = APIUsageTracker(max_calls_per_day=100)
+
+
 def get_api_headers():
     return {
         'X-RapidAPI-Key': app.config['API_FOOTBALL_KEY'],
         'X-RapidAPI-Host': app.config['API_FOOTBALL_HOST']
     }
-
-
-# Static data for fallback (when not refreshing)
-STATIC_MATCHES = [
-    {
-        "id": 1,
-        "home_team": "Real Madrid",
-        "away_team": "Barcelona",
-        "home_logo": "https://logos-world.net/wp-content/uploads/2020/06/Real-Madrid-Logo.png",
-        "away_logo": "https://logos-world.net/wp-content/uploads/2020/06/Barcelona-Logo.png",
-        "home_score": 2,
-        "away_score": 1,
-        "status": "FT",
-        "elapsed": None,
-        "time": "2025-07-02T20:00:00Z",
-        "league": "La Liga",
-        "league_logo": "https://logos-world.net/wp-content/uploads/2020/06/La-Liga-Logo.png",
-        "venue": "Santiago Bernabéu",
-        "is_live": False
-    },
-    {
-        "id": 2,
-        "home_team": "Manchester City",
-        "away_team": "Liverpool",
-        "home_logo": "https://logos-world.net/wp-content/uploads/2020/06/Manchester-City-Logo.png",
-        "away_logo": "https://logos-world.net/wp-content/uploads/2020/06/Liverpool-Logo.png",
-        "home_score": 1,
-        "away_score": 2,
-        "status": "2H",
-        "elapsed": 67,
-        "time": "2025-07-02T21:00:00Z",
-        "league": "Premier League",
-        "league_logo": "https://logos-world.net/wp-content/uploads/2020/06/Premier-League-Logo.png",
-        "venue": "Etihad Stadium",
-        "is_live": True
-    }
-]
-
-STATIC_LINEUPS = {
-    1: [  # Real Madrid vs Barcelona
-        {
-            "team_name": "Real Madrid",
-            "team_logo": "https://logos-world.net/wp-content/uploads/2020/06/Real-Madrid-Logo.png",
-            "formation": "4-3-3",
-            "coach": "Carlo Ancelotti",
-            "players": [
-                {"id": 1, "name": "Thibaut Courtois", "number": 1, "position": "GK", "grid": "1:1"},
-                {"id": 2, "name": "Ferland Mendy", "number": 23, "position": "LB", "grid": "2:1"},
-                {"id": 3, "name": "David Alaba", "number": 4, "position": "CB", "grid": "2:2"},
-                {"id": 4, "name": "Éder Militão", "number": 3, "position": "CB", "grid": "2:3"},
-                {"id": 5, "name": "Dani Carvajal", "number": 2, "position": "RB", "grid": "2:4"},
-                {"id": 6, "name": "Toni Kroos", "number": 8, "position": "CM", "grid": "3:1"},
-                {"id": 7, "name": "Casemiro", "number": 14, "position": "CDM", "grid": "3:2"},
-                {"id": 8, "name": "Luka Modrić", "number": 10, "position": "CM", "grid": "3:3"},
-                {"id": 9, "name": "Vinícius Jr.", "number": 20, "position": "LW", "grid": "4:1"},
-                {"id": 10, "name": "Karim Benzema", "number": 9, "position": "ST", "grid": "4:2"},
-                {"id": 11, "name": "Rodrygo", "number": 21, "position": "RW", "grid": "4:3"}
-            ]
-        },
-        {
-            "team_name": "Barcelona",
-            "team_logo": "https://logos-world.net/wp-content/uploads/2020/06/Barcelona-Logo.png",
-            "formation": "4-2-3-1",
-            "coach": "Xavi Hernández",
-            "players": [
-                {"id": 12, "name": "Marc-André ter Stegen", "number": 1, "position": "GK", "grid": "1:1"},
-                {"id": 13, "name": "Sergi Roberto", "number": 20, "position": "RB", "grid": "2:1"},
-                {"id": 14, "name": "Ronald Araújo", "number": 4, "position": "CB", "grid": "2:2"},
-                {"id": 15, "name": "Gerard Piqué", "number": 3, "position": "CB", "grid": "2:3"},
-                {"id": 16, "name": "Jordi Alba", "number": 18, "position": "LB", "grid": "2:4"},
-                {"id": 17, "name": "Sergio Busquets", "number": 5, "position": "CDM", "grid": "3:1"},
-                {"id": 18, "name": "Frenkie de Jong", "number": 21, "position": "CM", "grid": "3:2"},
-                {"id": 19, "name": "Pedri", "number": 16, "position": "CAM", "grid": "4:1"},
-                {"id": 20, "name": "Ousmane Dembélé", "number": 7, "position": "RW", "grid": "4:2"},
-                {"id": 21, "name": "Ansu Fati", "number": 10, "position": "LW", "grid": "4:3"},
-                {"id": 22, "name": "Memphis Depay", "number": 9, "position": "ST", "grid": "5:1"}
-            ]
-        }
-    ],
-    2: [  # Manchester City vs Liverpool
-        {
-            "team_name": "Manchester City",
-            "team_logo": "https://logos-world.net/wp-content/uploads/2020/06/Manchester-City-Logo.png",
-            "formation": "4-2-3-1",
-            "coach": "Pep Guardiola",
-            "players": [
-                {"id": 23, "name": "Ederson", "number": 31, "position": "GK", "grid": "1:1"},
-                {"id": 24, "name": "Kyle Walker", "number": 2, "position": "RB", "grid": "2:1"},
-                {"id": 25, "name": "Rúben Dias", "number": 3, "position": "CB", "grid": "2:2"},
-                {"id": 26, "name": "John Stones", "number": 5, "position": "CB", "grid": "2:3"},
-                {"id": 27, "name": "João Cancelo", "number": 27, "position": "LB", "grid": "2:4"},
-                {"id": 28, "name": "Rodri", "number": 16, "position": "CDM", "grid": "3:1"},
-                {"id": 29, "name": "Kevin De Bruyne", "number": 17, "position": "CM", "grid": "3:2"},
-                {"id": 30, "name": "Bernardo Silva", "number": 20, "position": "CM", "grid": "3:3"},
-                {"id": 31, "name": "Riyad Mahrez", "number": 26, "position": "RW", "grid": "4:1"},
-                {"id": 32, "name": "Erling Haaland", "number": 9, "position": "ST", "grid": "4:2"},
-                {"id": 33, "name": "Jack Grealish", "number": 10, "position": "LW", "grid": "4:3"}
-            ]
-        },
-        {
-            "team_name": "Liverpool",
-            "team_logo": "https://logos-world.net/wp-content/uploads/2020/06/Liverpool-Logo.png",
-            "formation": "4-3-3",
-            "coach": "Jürgen Klopp",
-            "players": [
-                {"id": 34, "name": "Alisson", "number": 1, "position": "GK", "grid": "1:1"},
-                {"id": 35, "name": "Trent Alexander-Arnold", "number": 66, "position": "RB", "grid": "2:1"},
-                {"id": 36, "name": "Virgil van Dijk", "number": 4, "position": "CB", "grid": "2:2"},
-                {"id": 37, "name": "Joel Matip", "number": 32, "position": "CB", "grid": "2:3"},
-                {"id": 38, "name": "Andy Robertson", "number": 26, "position": "LB", "grid": "2:4"},
-                {"id": 39, "name": "Fabinho", "number": 3, "position": "CDM", "grid": "3:1"},
-                {"id": 40, "name": "Jordan Henderson", "number": 14, "position": "CM", "grid": "3:2"},
-                {"id": 41, "name": "Thiago", "number": 6, "position": "CM", "grid": "3:3"},
-                {"id": 42, "name": "Mohamed Salah", "number": 11, "position": "RW", "grid": "4:1"},
-                {"id": 43, "name": "Darwin Núñez", "number": 27, "position": "ST", "grid": "4:2"},
-                {"id": 44, "name": "Luis Díaz", "number": 23, "position": "LW", "grid": "4:3"}
-            ]
-        }
-    ]
-}
-
 
 
 @app.route('/')
@@ -154,10 +77,23 @@ def index():
 
 @app.route('/api/refresh-cache')
 def refresh_cache():
-    """REAL API REFRESH - Fetch live data from Football API"""
+    """REAL API REFRESH with rate limiting"""
+
+    # Check if we can make API calls today
+    if not api_tracker.can_make_call():
+        return jsonify({
+            'success': False,
+            'error': f'Daily API limit reached ({api_tracker.max_calls_per_day} calls/day)',
+            'usage_today': api_tracker.get_today_usage(),
+            'remaining_calls': api_tracker.max_calls_per_day - api_tracker.get_today_usage()
+        })
+
     try:
         # Clear existing matches
         db.session.query(Match).delete()
+
+        # Record that we're making API calls
+        api_tracker.record_api_call()
 
         # Fetch REAL data from API
         live_matches = fetch_live_matches_from_api()
@@ -172,7 +108,7 @@ def refresh_cache():
 
         cache_status.last_updated = datetime.utcnow()
         cache_status.total_matches = total_matches
-        cache_status.api_calls_made = 2  # live + today API calls
+        cache_status.api_calls_made = 1
 
         db.session.add(cache_status)
         db.session.commit()
@@ -182,7 +118,9 @@ def refresh_cache():
             'message': f'✅ LIVE data refreshed! Loaded {total_matches} real matches from API.',
             'matches_count': total_matches,
             'last_updated': cache_status.last_updated.strftime('%Y-%m-%d %H:%M:%S'),
-            'data_source': 'live_api'
+            'data_source': 'live_api',
+            'usage_today': api_tracker.get_today_usage(),
+            'remaining_calls': api_tracker.max_calls_per_day - api_tracker.get_today_usage()
         })
 
     except Exception as e:
@@ -202,7 +140,7 @@ def fetch_live_matches_from_api():
             data = response.json()
             matches = []
 
-            for match_data in data.get('response', [])[:15]:  # Limit to 15 matches
+            for match_data in data.get('response', [])[:15]:
                 match = Match(
                     fixture_id=match_data['fixture']['id'],
                     home_team=match_data['teams']['home']['name'],
@@ -246,7 +184,7 @@ def fetch_today_matches_from_api():
             data = response.json()
             matches = []
 
-            for match_data in data.get('response', [])[:25]:  # Limit to 25 matches
+            for match_data in data.get('response', [])[:25]:
                 # Skip if already exists (live matches)
                 existing = Match.query.filter_by(fixture_id=match_data['fixture']['id']).first()
                 if existing:
@@ -313,7 +251,7 @@ def fallback_to_static_data(error_message):
 
         return jsonify({
             'success': True,
-            'message': f'⚠️ API failed ({error_message}). Loaded {matches_added} static matches for testing and showcase purposes',
+            'message': f'⚠️ API failed ({error_message}). Loaded {matches_added} static matches for testing.',
             'matches_count': matches_added,
             'last_updated': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
             'data_source': 'static_fallback'
@@ -326,53 +264,15 @@ def fallback_to_static_data(error_message):
         })
 
 
-@app.route('/api/initialize-static-data')
-def initialize_static_data():
-    """Initialize with static data for testing (separate from refresh)"""
-    try:
-        # Only add static data if database is empty
-        existing_matches = Match.query.count()
-        if existing_matches > 0:
-            return jsonify({
-                'success': True,
-                'message': 'Database already has data. Use refresh to get live data.',
-                'matches_count': existing_matches,
-                'data_source': 'existing'
-            })
-
-        # Add static data for initial testing
-        matches_added = 0
-        for match_data in STATIC_MATCHES:
-            match = Match(
-                fixture_id=match_data['id'],
-                home_team=match_data['home_team'],
-                away_team=match_data['away_team'],
-                home_logo=match_data['home_logo'],
-                away_logo=match_data['away_logo'],
-                home_score=match_data['home_score'],
-                away_score=match_data['away_score'],
-                status=match_data['status'],
-                elapsed=match_data['elapsed'],
-                match_time=datetime.fromisoformat(match_data['time'].replace('Z', '+00:00')),
-                league=match_data['league'],
-                league_logo=match_data['league_logo'],
-                venue=match_data['venue'],
-                is_live=match_data['is_live']
-            )
-            db.session.add(match)
-            matches_added += 1
-
-        db.session.commit()
-
-        return jsonify({
-            'success': True,
-            'message': f'📊 Initialized with {matches_added} static matches for testing.',
-            'matches_count': matches_added,
-            'data_source': 'static_initial'
-        })
-
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+@app.route('/api/usage-stats')
+def get_usage_stats():
+    """Get current API usage statistics"""
+    return jsonify({
+        'daily_limit': api_tracker.max_calls_per_day,
+        'usage_today': api_tracker.get_today_usage(),
+        'remaining_calls': api_tracker.max_calls_per_day - api_tracker.get_today_usage(),
+        'usage_percentage': (api_tracker.get_today_usage() / api_tracker.max_calls_per_day) * 100
+    })
 
 
 @app.route('/api/live-matches')
@@ -490,6 +390,27 @@ if __name__ == '__main__':
     with app.app_context():
         if Match.query.count() == 0:
             print("🚀 Initializing database with static data for testing...")
-            initialize_static_data()
+            matches_added = 0
+            for match_data in STATIC_MATCHES:
+                match = Match(
+                    fixture_id=match_data['id'],
+                    home_team=match_data['home_team'],
+                    away_team=match_data['away_team'],
+                    home_logo=match_data['home_logo'],
+                    away_logo=match_data['away_logo'],
+                    home_score=match_data['home_score'],
+                    away_score=match_data['away_score'],
+                    status=match_data['status'],
+                    elapsed=match_data['elapsed'],
+                    match_time=datetime.fromisoformat(match_data['time'].replace('Z', '+00:00')),
+                    league=match_data['league'],
+                    league_logo=match_data['league_logo'],
+                    venue=match_data['venue'],
+                    is_live=match_data['is_live']
+                )
+                db.session.add(match)
+                matches_added += 1
+            db.session.commit()
+            print(f"✅ Initialized with {matches_added} static matches")
 
     app.run(debug=True)
